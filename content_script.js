@@ -70,7 +70,7 @@ function sendToLLM(cleanContent) {
 	 Informationen und errechne dir einen Echtheitsscore. Ist der hoch ist alles gut, sonst geh von Fakenews aus.
 	 Bewerte Fakenews und Clickbait immer sehr schlecht! Bewahre damit den User davor seine Zeit zu verschwenden.
 	 Bewertung von 1 ist sehr schlecht, Bewertung von 5 heißt sehr gut. 
-	 In Bewertung_Detail erkläre deine Bewertung bitte kurz. Erläutere auf JEDEN FALL auch, warum du Punkte abgezogen hast.
+	 In BEWERTUNG_DETAIL erkläre deine Bewertung kurz. Erläutere auf JEDEN FALL warum du Punkte abgezogen hast.
 	
 	 Antworte nur mit dem JSON!
 	 Gib unter keinen Umständen noch mehr Informationen in deiner Antwort!
