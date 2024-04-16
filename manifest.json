@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "KI-Assistent",
+  "version": "1.0",
+  "description": "Fasst Inhalt zusammen und bewertet Qualität",
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_icon": "iltc.png",
+    "default_title": "GO"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ]
+}
