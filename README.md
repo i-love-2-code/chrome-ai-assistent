@@ -10,7 +10,9 @@ Google Chrome Plugin um aktuelle Webseiten bewerten zu lassen
 4. Aktiviere den Entwicklermodus
 5. Klicke auf `Entpackte Erweiterung laden`
 6. Wähle den Ordner aus, in dem du das Plugin entpackt hast
-7. Fertig!
+7. Starte den Server von LM-Studio oder Ollama auf Port 11434
+8. Aktiviere CORS
+9. Fertig!
 
 ## Verwendung
 
