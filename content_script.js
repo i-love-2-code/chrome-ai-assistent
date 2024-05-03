@@ -1,3 +1,58 @@
+
+const systemPromptDefault = `
+     Du bist ein hilfreicher Assistent und bekommst von einem Browser-Plugin ein bereinigtes HTML. 
+	 Extrahiere aus diesem HTML den Haupt-Inhalt und fasse ihn in einem JSON in DEUTSCHER SPRACHE zusammen.
+	 
+	 Hier der Aufbau des JSON:
+	 
+	 {
+		 "title" : TITEL_DEINER_ZUSAMMENFASSUNG,
+		 "content" : DEINE_KURZE_ZUSAMMENFASSUNG,
+		 "BEWERTUNG" : 1_BIS_5_5_IST_AM_BESTEN_ALS_INT,
+		 "BEWERTUNG_DETAIL" : ERLÄUTERUNG_DEINER_BEWERTUNG
+     }
+	 
+	 Als Bewertung gib bitte deine eigene Bewertung ab. Bewerte dabei Inhalt, Neutralität, Mehrwert und Echtheit der Information. 
+	 Wenn du dir bei der Echtheit nicht sicher bist, bewerte den Inhalt Schritt für Schritt mit dir zur Verfügung stehenden
+	 Informationen und errechne dir einen Echtheitsscore. Ist der hoch ist alles gut, sonst geh von Fakenews aus.
+	 Bewerte Fakenews und Clickbait immer sehr schlecht! Bewahre damit den User davor seine Zeit zu verschwenden.
+	 Bewertung von 1 ist sehr schlecht, Bewertung von 5 heißt sehr gut. 
+	 In BEWERTUNG_DETAIL erkläre deine Bewertung kurz. Erläutere auf JEDEN FALL warum du Punkte abgezogen hast.
+	
+	 Antworte nur mit dem JSON!
+	 Gib unter keinen Umständen noch mehr Informationen in deiner Antwort!
+	 `;
+
+
+
+
+const systemPromptYt = `
+     Du bist ein hilfreicher Assistent und bekommst von einem Browser-Plugin das Transkript eines Youtube-Videos. 
+	 Fasse den Inhalt ausführlich in einem JSON in DEUTSCHER SPRACHE zusammen.
+	 
+	 Hier der Aufbau des JSON:
+	 
+	 {
+		 "title" : TITEL_DEINER_ZUSAMMENFASSUNG,
+		 "content" : DEINE_ZUSAMMENFASSUNG,
+		 "BEWERTUNG" : 1_BIS_5_5_IST_AM_BESTEN_ALS_INT,
+		 "BEWERTUNG_DETAIL" : ERLÄUTERUNG_DEINER_BEWERTUNG
+     }
+	 
+	 Als Bewertung gib bitte deine eigene Bewertung ab. Bewerte dabei Inhalt, Neutralität, Mehrwert und Echtheit der Information. 
+	 Wenn du dir bei der Echtheit nicht sicher bist, bewerte den Inhalt Schritt für Schritt mit dir zur Verfügung stehenden
+	 Informationen und errechne dir einen Echtheitsscore. Ist der hoch ist alles gut, sonst geh von Fakenews aus.
+	 Bewerte Fakenews und Clickbait immer sehr schlecht! Bewahre damit den User davor seine Zeit zu verschwenden.
+	 Bewertung von 1 ist sehr schlecht, Bewertung von 5 heißt sehr gut. 
+	 In BEWERTUNG_DETAIL erkläre deine Bewertung kurz. Erläutere auf JEDEN FALL jeden Punkt den du abgezogen hast.
+	
+	 Antworte nur mit dem JSON!
+	 Gib unter keinen Umständen noch mehr Informationen in deiner Antwort!
+	 `;
+
+
+
+
 function createPopup(jsonData) {
 
     const popupHTML = `
@@ -51,31 +106,8 @@ function createPopup(jsonData) {
 }
 
 
-function sendToLLM(cleanContent) {
-    let systemPrompt = `
-     Du bist ein hilfreicher Assistent und bekommst von einem Browser-Plugin ein bereinigtes HTML. 
-	 Extrahiere aus diesem HTML den Haupt-Inhalt und fasse ihn in einem JSON in DEUTSCHER SPRACHE zusammen.
-	 
-	 Hier der Aufbau des JSON:
-	 
-	 {
-		 "title" : TITEL_DEINER_ZUSAMMENFASSUNG,
-		 "content" : DEINE_KURZE_ZUSAMMENFASSUNG,
-		 "BEWERTUNG" : 1_BIS_5_5_IST_AM_BESTEN_ALS_INT,
-		 "BEWERTUNG_DETAIL" : ERLÄUTERUNG_DEINER_BEWERTUNG
-     }
-	 
-	 Als Bewertung gib bitte deine eigene Bewertung ab. Bewerte dabei Inhalt, Neutralität, Mehrwert und Echtheit der Information. 
-	 Wenn du dir bei der Echtheit nicht sicher bist, bewerte den Inhalt Schritt für Schritt mit dir zur Verfügung stehenden
-	 Informationen und errechne dir einen Echtheitsscore. Ist der hoch ist alles gut, sonst geh von Fakenews aus.
-	 Bewerte Fakenews und Clickbait immer sehr schlecht! Bewahre damit den User davor seine Zeit zu verschwenden.
-	 Bewertung von 1 ist sehr schlecht, Bewertung von 5 heißt sehr gut. 
-	 In BEWERTUNG_DETAIL erkläre deine Bewertung kurz. Erläutere auf JEDEN FALL warum du Punkte abgezogen hast.
-	
-	 Antworte nur mit dem JSON!
-	 Gib unter keinen Umständen noch mehr Informationen in deiner Antwort!
-	 `;
-
+function sendToLLM(cleanContent, systemPrompt) {
+   
     systemPrompt = systemPrompt.trim();
 
     console.log("clean: " + cleanContent.length);
@@ -181,9 +213,73 @@ function getCleanContent() {
     let cleanContent = bodyClone.outerHTML;
 
     cleanContent = removeEmptyHtmlElements(cleanContent);
-
-    sendToLLM(cleanContent);
+    console.log("clean: " + cleanContent)
+	return cleanContent;
 }
 
-getCleanContent();
- 
+
+
+function getContentFromYoutube() {
+	
+	$("expand").click();
+	const lst = document.getElementsByTagName("yt-button-shape");
+	
+	for(let i = 0, max = lst.length; i < max; i++) 
+		if(lst[i].textContent === "Transkript anzeigen") { 
+			lst[i].firstChild.click(); 
+			break; 
+		}
+	
+	window.setTimeout(
+		function(){
+			
+			let isTranscript = false
+			let content = "";
+			const context = $("panels")
+			
+			let lst = context.getElementsByTagName("yt-formatted-string");
+
+			for(let i = 0, max = lst.length; i < max; i++)  {
+				if(isTranscript && lst[i].textContent != "") 
+					content += lst[i].textContent + "\n";
+				
+				if(lst[i].textContent === "Transkript") 
+					isTranscript = true;  	
+			}
+			
+			sendToLLM(content, systemPromptYt);
+		},
+		2000
+	);
+}
+
+
+
+
+
+function isYtVideo() {
+	return window.location.href.startsWith(
+		'https://www.youtube.com/watch?v='
+	)
+}
+
+
+
+$ =  function(id) {
+	return document.getElementById(id);
+};
+
+
+// 1. youtube oder nicht?
+if(isYtVideo()) {
+    // auf yt-video, content auf neue Art ermitteln	
+	getContentFromYoutube();	
+	
+} else {
+	// nicht auf yt-video
+	cleanContent = getCleanContent();	
+	sendToLLM(cleanContent, systemPromptDefault);
+}
+
+
+
