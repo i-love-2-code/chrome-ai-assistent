@@ -1,5 +1,5 @@
 
-const systemPromptDefault = `
+systemPromptDefault = `
      Du bist ein hilfreicher Assistent und bekommst von einem Browser-Plugin ein bereinigtes HTML. 
 	 Extrahiere aus diesem HTML den Haupt-Inhalt und fasse ihn in einem JSON in DEUTSCHER SPRACHE zusammen.
 	 
@@ -26,7 +26,7 @@ const systemPromptDefault = `
 
 
 
-const systemPromptYt = `
+systemPromptYt = `
      Du bist ein hilfreicher Assistent und bekommst von einem Browser-Plugin das Transkript eines Youtube-Videos. 
 	 Fasse den Inhalt ausführlich in einem JSON in DEUTSCHER SPRACHE zusammen.
 	 
